@@ -1,5 +1,24 @@
 body {
+  margin 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ud {
+  width: 644px;
+  height: 400px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+}
+
+h1 {
   font-size: large;
   font-family: sans-serif;
   margin: auto;
+}
+
+p {
+  font-family: sans-serif;
 }
