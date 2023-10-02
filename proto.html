@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensors</title>
+    <link rel="stylesheet" href="./proto-style.css">
+</head>
+
+<body>
+    <main id="main-doc">
+        <div class="navwrap">
+            <div class="pytorch">
+                <img id="logo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/PyTorch_logo_icon.svg/992px-PyTorch_logo_icon.svg.png?20200318225611"
+                    alt="The PyTorch Logo">
+                <h1 class="logo-text">PyTorch</h1>
+            </div>
+
+            <nav id="navbar">
+                <header>&#8203;</header> <!--This makes freecodecamp happy-->
+                <ul>
+                    <li><a class="nav-link" href="#tensors">Tensors</a></li>
+                    <li><a class="nav-link" href="#initializing_a_tensor">Initializing a Tensor</a></li>
+                    <li><a class="nav-link" href="#attributes_of_a_tensor">Attributes of a Tensor</a></li>
+                    <li><a class="nav-link" href="#operations_on_tensors">Operations on Tensors</a></li>
+                    <li><a class="nav-link" href="#bridge_with_numpy">Bridge with NumPy</a></li>
+                    <li><a class="nav-link" href="#tensor_to_numpy_array">Tensor to NumPy Array</a></li>
+                    <li><a class="nav-link" href="#numpy_array_to_tensor">NumPy Array to Tensor</a></li>
+                    <li><a class="nav-link" href="#further_reading">Further Reading</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="content">
+            <div class="container">
+                <section class="main-section" id="tensors">
+                    <header class="big-title">Tensors</header>
+                    <p>Tensors are a specialized data structure that are very similar to arrays and matrices. In
+                        PyTorch, we use tensors to encode the inputs and outputs of a model, as well as the model’s
+                        parameters.</p>
+                    <p>Tensors are similar to <a href="https://numpy.org/">NumPy’s</a> ndarrays, except that tensors can
+                        run on GPUs or other hardware accelerators. In fact, tensors and NumPy arrays can often share
+                        the same underlying memory, eliminating the need to copy data (see <a
+                            href="#bridge_with_numpy">Bridge with NumPy</a>). Tensors are also optimized for automatic
+                        differentiation (we’ll see more about that later in the <a
+                            href="https://pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html">Autograd</a>
+                        section). If you’re familiar with ndarrays, you’ll be right at home with the Tensor API. If not,
+                        follow along!</p>
+                    <code class="block">
+                        import torch
+                        import numpy as np
+                    </code>
+                </section>
+
+                <section class="main-section" id="initializing_a_tensor">
+                    <header class="medium-title">Initializing a Tensor</header>
+                    <p>Tensors can be initialized in various ways. Take a look at the following examples:</p>
+                    <b class="bold-title">Directly from data</b>
+                    <p>Tensors can be created directly from data. The data type is automatically inferred.</p>
+                    <code class="block">
+                        data = [[1, 2],[3, 4]]
+                        x_data = torch.tensor(data)
+                    </code>
+                    <b class="bold-title">From a NumPy array</b>
+                    <p>Tensors can be created from NumPy arrays (and vice versa - see <a
+                            href="#bridge_with_numpy">Bridge with NumPy</a>).</p>
+                    <code class="block">
+                        np_array = np.array(data)
+                        x_np = torch.from_numpy(np_array)
+                    </code>
+                    <b class="bold-title">From another tensor:</b>
+                    <p>The new tensor retains the properties (shape, datatype) of the argument tensor, unless explicitly
+                        overridden.</p>
+                    <code class="block">
+                        x_ones = torch.ones_like(x_data) # retains the properties of x_data
+                        print(f"Ones Tensor: \n {x_ones} \n")
+
+                        x_rand = torch.rand_like(x_data, dtype=torch.float) # overrides the datatype of x_data
+                        print(f"Random Tensor: \n {x_rand} \n")
+                    </code>
+                    <samp>
+                        Ones Tensor:
+                        tensor([[1, 1],
+                        [1, 1]])
+
+                        Random Tensor:
+                        tensor([[0.8823, 0.9150],
+                        [0.3829, 0.9593]])
+                    </samp>
+                    <b class="bold-title">With random or constant values:</b>
+                    <p><code class="inline">shape</code> is a tuple of tensor dimensions. In the functions below, it
+                        determines the dimensionality of the output tensor.</p>
+                    <code class="block">
+                        shape = (2,3,)
+                        rand_tensor = torch.rand(shape)
+                        ones_tensor = torch.ones(shape)
+                        zeros_tensor = torch.zeros(shape)
+                        
+                        print(f"Random Tensor: \n {rand_tensor} \n")
+                        print(f"Ones Tensor: \n {ones_tensor} \n")
+                        print(f"Zeros Tensor: \n {zeros_tensor}")
+                    </code>
+                    <samp>
+                        Random Tensor:
+                        tensor([[0.3904, 0.6009, 0.2566],
+                        [0.7936, 0.9408, 0.1332]])
+
+                        Ones Tensor:
+                        tensor([[1., 1., 1.],
+                        [1., 1., 1.]])
+
+                        Zeros Tensor:
+                        tensor([[0., 0., 0.],
+                        [0., 0., 0.]])
+                    </samp>
+                </section>
+
+                <section class="main-section" id="attributes_of_a_tensor">
+                    <header class="medium-title">Attributes of a Tensor</header>
+                    <p>Tensor attributes describe their shape, datatype, and the device on which they are stored.</p>
+                    <code class="block">
+                        tensor = torch.rand(3,4)
+
+                        print(f"Shape of tensor: {tensor.shape}")
+                        print(f"Datatype of tensor: {tensor.dtype}")
+                        print(f"Device tensor is stored on: {tensor.device}")
+                    </code>
+                    <samp>
+                        Shape of tensor: torch.Size([3, 4])
+                        Datatype of tensor: torch.float32
+                        Device tensor is stored on: cpu
+                    </samp>
+                </section>
+
+                <section class="main-section" id="operations_on_tensors">
+                    <header class="medium-title">Operations on Tensors</header>
+                    <p>Over 100 tensor operations, including arithmetic, linear algebra, matrix manipulation
+                        (transposing, indexing, slicing), sampling and more are comprehensively described <a
+                            href="https://pytorch.org/docs/stable/torch.html">here</a>.</p>
+                    <p>Each of these operations can be run on the GPU (at typically higher speeds than on a CPU). If
+                        you’re using Colab, allocate a GPU by going to Runtime > Change runtime type > GPU.</p>
+                    <p>By default, tensors are created on the CPU. We need to explicitly move tensors to the GPU using
+                        .to method (after checking for GPU availability). Keep in mind that copying large tensors across
+                        devices can be expensive in terms of time and memory!</p>
+                    <code class="block">
+                        # We move our tensor to the GPU if available
+                        if torch.cuda.is_available():
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;tensor = tensor.to("cuda")
+                    </code>
+                    <p>Try out some of the operations from the list. If you’re familiar with the NumPy API, you’ll find
+                        the Tensor API a breeze to use.</p>
+                    <b class="bold-title">Standard numpy-like indexing and slicing:</b>
+                    <code class="block">
+                        tensor = torch.ones(4, 4)
+                        print(f"First row: {tensor[0]}")
+                        print(f"First column: {tensor[:, 0]}")
+                        print(f"Last column: {tensor[..., -1]}")
+                        tensor[:,1] = 0
+                        print(tensor)
+                    </code>
+                    <samp>
+                        First row: tensor([1., 1., 1., 1.])
+                        First column: tensor([1., 1., 1., 1.])
+                        Last column: tensor([1., 1., 1., 1.])
+                        tensor([[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.]])
+                    </samp>
+                    <b class="bold-title">Joining tensors</b>
+                    <p>You can use <code class="inline">torch.cat</code> to concatenate a sequence of tensors along a
+                        given dimension. See also <a
+                            href="https://pytorch.org/docs/stable/generated/torch.stack.html">torch.stack</a>, another
+                        tensor joining operator that is subtly different from <code class="inline">torch.cat</code>.</p>
+                    <code class="block">
+                        t1 = torch.cat([tensor, tensor, tensor], dim=1)
+                        print(t1)
+                    </code>
+                    <samp>
+                        tensor([[1., 0., 1., 1., 1., 0., 1., 1., 1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1., 1., 0., 1., 1., 1., 0.,
+                        1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1., 1., 0., 1., 1., 1., 0.,
+                        1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1., 1., 0., 1., 1., 1., 0.,
+                        1., 1.]])
+                    </samp>
+                    <b class="bold-title">Arithmetic operations</b>
+                    <code class="block">
+                        # This computes the matrix multiplication between two tensors. y1, y2, y3 will have the same value
+                        # ``tensor.T`` returns the transpose of a tensor
+                        y1 = tensor @ tensor.T
+                        y2 = tensor.matmul(tensor.T)
+
+                        y3 = torch.rand_like(y1)
+                        torch.matmul(tensor, tensor.T, out=y3)
+
+
+                        # This computes the element-wise product. z1, z2, z3 will have the same value
+                        z1 = tensor * tensor
+                        z2 = tensor.mul(tensor)
+
+                        z3 = torch.rand_like(tensor)
+                        torch.mul(tensor, tensor, out=z3)
+                    </code>
+                    <samp>
+                        tensor([[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.]])
+                    </samp>
+                    <b class="bold-title">Single-element tensors</b>
+                    <p>If you have a one-element tensor, for example by aggregating all values of a tensor into one
+                        value, you can convert it to a Python numerical value using <code class="inline">item()</code>:
+                    </p>
+                    <code class="block">
+                        agg = tensor.sum()
+                        agg_item = agg.item()
+                        print(agg_item, type(agg_item))
+                    </code>
+                    <samp>
+                        12.0 &lt;class 'float'&gt;
+                    </samp>
+                    <b class="bold-title">In-place operations</b>
+                    <p>Operations that store the result into the operand are called in-place. They are denoted by a
+                        <code class="inline">_</code> suffix.</p>
+                    <p>For example: <code class="inline">x.copy_(y)</code>, <code class="inline">x.t_()</code>, will
+                        change <code class="inline">x</code>.</p>
+                    <code class="block">
+                        print(f"{tensor} \n")
+                        tensor.add_(5)
+                        print(tensor)
+                    </code>
+                    <samp>
+                        tensor([[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[1., 0., 1., 1.]])
+
+                        tensor([[6., 5., 6., 6.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[6., 5., 6., 6.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[6., 5., 6., 6.],
+                        &emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;&emsp14;[6., 5., 6., 6.]])
+                    </samp>
+                    <p>In-place operations save some memory, but can be problematic when computing derivatives because
+                        of an immediate loss of history. Hence, their use is discouraged.</p>
+                </section>
+
+                <section class="main-section" id="bridge_with_numpy">
+                    <header class="medium-title">Bridge with NumPy</header>
+                    <p>Tensors on the CPU and NumPy arrays can share their underlying memory locations, and changing one
+                        will change the other.</p>
+                </section>
+
+                <section class="main-section" id="tensor_to_numpy_array">
+                    <header class="medium-title">Tensor to NumPy Array</header>
+                    <code class="block">
+                        t = torch.ones(5)
+                        print(f"t: {t}")
+                        n = t.numpy()
+                        print(f"n: {n}")
+                    </code>
+                    <samp>
+                        t: tensor([1., 1., 1., 1., 1.])
+                        n: [1. 1. 1. 1. 1.]
+                    </samp>
+                    <p>A change in the tensor reflects in the NumPy array.</p>
+                    <code class="block">
+                        t.add_(1)
+                        print(f"t: {t}")
+                        print(f"n: {n}")
+                    </code>
+                    <samp>
+                        t: tensor([2., 2., 2., 2., 2.])
+                        n: [2. 2. 2. 2. 2.]
+                    </samp>
+                </section>
+
+                <section class="main-section" id="numpy_array_to_tensor">
+                    <header class="medium-title">NumPy Array to Tensor</header>
+                    <code class="block">
+                        n = np.ones(5)
+                        t = torch.from_numpy(n)
+                    </code>
+                    <p>Changes in the NumPy array reflects in the tensor.</p>
+                    <code class="block">
+                        np.add(n, 1, out=n)
+                        print(f"t: {t}")
+                        print(f"n: {n}")
+                    </code>
+                    <samp>
+                        t: tensor([2., 2., 2., 2., 2.], dtype=torch.float64)
+                        n: [2. 2. 2. 2. 2.]
+                    </samp>
+                </section>
+
+                <section class="main-section" id="further_reading">
+                    <header class="medium-title">Further Reading</header>
+                    <p>Here are some additional resources to learn more</p>
+                    <ul>
+                        <li><a href="https://pytorch.org/docs/stable/torch.html">Tensor Operation Reference</a></li>
+                        <li><a href="https://pytorch.org/docs/stable/tensor_attributes.html?highlight=tensors">Tensor Attributes</a></li>
+                        <li><a href="https://pytorch.org/docs/stable/tensor_view.html">Tensor Views</a></li>
+                        <li><a href="https://pytorch.org/docs/stable/notes/extending.html?highlight=tensors">Extending PyTorch</a></li>
+                        <li><a href="https://pytorch.org/docs/stable/notes/autograd.html?highlight=tensors">Autograd Mechanics</a></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
