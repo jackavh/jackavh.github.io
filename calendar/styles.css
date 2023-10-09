@@ -1,0 +1,11 @@
+* {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  iframe{
+    width: 100vw;
+    height: 100vh;
+    filter: invert(.9) saturate(0.5) hue-rotate(180deg);
+  }
